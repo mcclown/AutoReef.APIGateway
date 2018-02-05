@@ -33,7 +33,7 @@ paths:
           description: "Operation successful"
           schema:
             type: "boolean"
-      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+      x-swagger-router-controller: "swagger.swagger_server.controllers.light_controller"
     put:
       tags:
       - "light"
@@ -46,7 +46,7 @@ paths:
       responses:
         200:
           description: "Operation successful"
-      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+      x-swagger-router-controller: "swagger.swagger_server.controllers.light_controller"
   /light/colors:
     get:
       tags:
@@ -61,7 +61,7 @@ paths:
             type: "array"
             items:
               type: "string"
-      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+      x-swagger-router-controller: "swagger.swagger_server.controllers.light_controller"
   /light/colorIntensity:
     get:
       tags:
@@ -76,7 +76,7 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/colorIntensity"
-      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+      x-swagger-router-controller: "swagger.swagger_server.controllers.light_controller"
     patch:
       tags:
       - "light"
@@ -95,7 +95,7 @@ paths:
           description: "Operation Successful"
         400:
           description: "One or more input colors are not valid"
-      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+      x-swagger-router-controller: "swagger.swagger_server.controllers.light_controller"
   /light/colorIntensity/update:
     patch:
       tags:
@@ -117,7 +117,7 @@ paths:
           description: "No change required (levels already at max/min)"
         400:
           description: "One of more input colors are not valid"
-      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+      x-swagger-router-controller: "swagger.swagger_server.controllers.light_controller"
 definitions:
   colorIntensity:
     type: "object"

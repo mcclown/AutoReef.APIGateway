@@ -5,8 +5,8 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
-from swagger_server.test import BaseTestCase
+from swagger.swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
+from swagger.swagger_server.test import BaseTestCase
 
 
 class TestLightController(BaseTestCase):

@@ -1,8 +1,8 @@
 import connexion
 import six
 
-from swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
-from swagger_server import util
+from swagger.swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
+from swagger.swagger_server import util
 
 
 def get_colors():  # noqa: E501
