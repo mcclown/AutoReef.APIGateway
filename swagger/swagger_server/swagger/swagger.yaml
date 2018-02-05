@@ -11,7 +11,7 @@ info:
   license:
     name: "MIT"
     url: "https://raw.githubusercontent.com/mcclown/AutoReef/master/LICENSE"
-host: "virtserver.swaggerhub.com"
+host: "192.168.1.100:8080"
 basePath: "/AutoReef/AutoReef.ApiGateway/1.0.0"
 tags:
 - name: "light"

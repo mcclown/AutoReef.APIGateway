@@ -4,6 +4,10 @@ import six
 from swagger.swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
 from swagger.swagger_server import util
 
+import requests
+import json
+
+light_base_path = "http://192.168.1.101/api"
 
 def get_colors():  # noqa: E501
     """get_colors
@@ -13,7 +17,21 @@ def get_colors():  # noqa: E501
 
     :rtype: List[str]
     """
-    return 'do some magic!'
+
+    r = requests.get(light_base_path + "/power")
+
+    r_data = r.json()
+
+    if r_data["response_code"] != 0:
+        return "Unknown server error", 500
+
+    colors = []
+
+    #Only handling the first device for the moment
+    for color in r_data["devices"][0]["normal"]:
+        colors.append(color)
+
+    return colors, 200
 
 
 def get_light_color_intensity():  # noqa: E501
@@ -35,7 +53,15 @@ def get_light_control():  # noqa: E501
 
     :rtype: bool
     """
-    return 'do some magic!'
+
+    r = requests.get(light_base_path + '/schedule/enable')
+
+    r_data = r.json()
+
+    if r_data["response_code"] != 0:
+        return "Unknown server error", 500
+
+    return not r_data["enable"], 200
 
 
 def set_light_color_intensity(body):  # noqa: E501
@@ -63,7 +89,18 @@ def set_light_control(enable):  # noqa: E501
 
     :rtype: None
     """
-    return 'do some magic!'
+
+    #Invert meaning, since the AquaIllumination light API enables schedules, not manual controls.
+    data = {"enable":not enable}
+
+    r = requests.put(light_base_path + "/schedule/enable", data = json.dumps(data) )
+
+    r_data = r.json()
+
+    if r_data['response_code'] != 0:
+        return 'Unknown server error', 500
+        
+    return 'Operation Successful', 200
 
 
 def update_light_color_intensity(body):  # noqa: E501
