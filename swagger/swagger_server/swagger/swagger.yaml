@@ -1,0 +1,133 @@
+---
+swagger: "2.0"
+info:
+  description: "API to allow control of an AutoReef system, from outside of a home\
+    \ network."
+  version: "1.0.0"
+  title: "AutoReef Api Gateway"
+  contact:
+    url: "https://github.com/mcclown/AutoReef"
+    email: "mcclown@gmail.com"
+  license:
+    name: "MIT"
+    url: "https://raw.githubusercontent.com/mcclown/AutoReef/master/LICENSE"
+host: "virtserver.swaggerhub.com"
+basePath: "/AutoReef/AutoReef.ApiGateway/1.0.0"
+tags:
+- name: "light"
+  description: "Functions for controlling the aquarium lights"
+schemes:
+- "https"
+- "http"
+paths:
+  /light/manualControl:
+    get:
+      tags:
+      - "light"
+      description: "Get the current status of light manual control (enabled/disabled).\
+        \ It is assumed that lights will usually be on a schedule/timer."
+      operationId: "get_light_control"
+      parameters: []
+      responses:
+        200:
+          description: "Operation successful"
+          schema:
+            type: "boolean"
+      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+    put:
+      tags:
+      - "light"
+      operationId: "set_light_control"
+      parameters:
+      - name: "enable"
+        in: "query"
+        required: true
+        type: "boolean"
+      responses:
+        200:
+          description: "Operation successful"
+      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+  /light/colors:
+    get:
+      tags:
+      - "light"
+      description: "Get the list of valid colors to pass to other colors methods."
+      operationId: "get_colors"
+      parameters: []
+      responses:
+        200:
+          description: "Operation Successfull"
+          schema:
+            type: "array"
+            items:
+              type: "string"
+      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+  /light/colorIntensity:
+    get:
+      tags:
+      - "light"
+      description: "Get the current status of all colour intensities."
+      operationId: "get_light_color_intensity"
+      parameters: []
+      responses:
+        200:
+          description: "Operation successful"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/colorIntensity"
+      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+    patch:
+      tags:
+      - "light"
+      description: "Update the specified color intensities."
+      operationId: "set_light_color_intensity"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/colorIntensity"
+      responses:
+        200:
+          description: "Operation Successful"
+        400:
+          description: "One or more input colors are not valid"
+      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+  /light/colorIntensity/update:
+    patch:
+      tags:
+      - "light"
+      description: "Update a given color by the specified intensity percentage."
+      operationId: "update_light_color_intensity"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/colorIntensity"
+      responses:
+        200:
+          description: "Operation Successfull"
+        204:
+          description: "No change required (levels already at max/min)"
+        400:
+          description: "One of more input colors are not valid"
+      x-swagger-router-controller: "swagger_server.controllers.light_controller"
+definitions:
+  colorIntensity:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      intensity:
+        type: "integer"
+        minimum: 0
+        maximum: 100
+    example:
+      intensity: 8
+      name: "name"
