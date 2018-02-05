@@ -34,7 +34,7 @@ paths:
           schema:
             type: "boolean"
       x-swagger-router-controller: "swagger_server.controllers.light_controller"
-    put:
+    post:
       tags:
       - "light"
       operationId: "set_light_control"
@@ -97,7 +97,7 @@ paths:
           description: "One or more input colors are not valid"
       x-swagger-router-controller: "swagger_server.controllers.light_controller"
   /light/colorIntensity/update:
-    patch:
+    post:
       tags:
       - "light"
       description: "Update a given color by the specified intensity percentage."

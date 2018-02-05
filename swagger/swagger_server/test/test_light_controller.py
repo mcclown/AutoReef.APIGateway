@@ -67,7 +67,7 @@ class TestLightController(BaseTestCase):
         query_string = [('enable', true)]
         response = self.client.open(
             '/AutoReef/AutoReef.ApiGateway/1.0.0/light/manualControl',
-            method='PUT',
+            method='POST',
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -80,7 +80,7 @@ class TestLightController(BaseTestCase):
         body = [ColorIntensity()]
         response = self.client.open(
             '/AutoReef/AutoReef.ApiGateway/1.0.0/light/colorIntensity/update',
-            method='PATCH',
+            method='POST',
             data=json.dumps(body),
             content_type='application/json')
         self.assert200(response,
