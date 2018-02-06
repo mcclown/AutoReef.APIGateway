@@ -6,6 +6,7 @@ from flask import json
 from six import BytesIO
 
 from swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
+from swagger_server.models.color_intensity_change import ColorIntensityChange  # noqa: E501
 from swagger_server.test import BaseTestCase
 
 
@@ -77,7 +78,7 @@ class TestLightController(BaseTestCase):
 
         
         """
-        body = [ColorIntensity()]
+        body = [ColorIntensityChange()]
         response = self.client.open(
             '/AutoReef/AutoReef.ApiGateway/1.0.0/light/colorIntensity/update',
             method='POST',

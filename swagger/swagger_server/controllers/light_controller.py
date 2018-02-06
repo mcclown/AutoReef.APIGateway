@@ -2,6 +2,7 @@ import connexion
 import six
 
 from swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
+from swagger_server.models.color_intensity_change import ColorIntensityChange  # noqa: E501
 from swagger_server import util
 
 
@@ -77,5 +78,5 @@ def update_light_color_intensity(body):  # noqa: E501
     :rtype: None
     """
     if connexion.request.is_json:
-        body = [ColorIntensity.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+        body = [ColorIntensityChange.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
     return 'do some magic!'

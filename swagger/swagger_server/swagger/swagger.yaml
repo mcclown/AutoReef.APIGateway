@@ -109,7 +109,7 @@ paths:
         schema:
           type: "array"
           items:
-            $ref: "#/definitions/colorIntensity"
+            $ref: "#/definitions/colorIntensityChange"
       responses:
         200:
           description: "Operation Successfull"
@@ -131,3 +131,12 @@ definitions:
     example:
       intensity: 8
       name: "name"
+  colorIntensityChange:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+      intensityChange:
+        type: "integer"
+        minimum: -100
+        maximum: 100
