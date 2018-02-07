@@ -9,6 +9,15 @@ import json
 
 light_base_path = "http://192.168.1.101/api"
 
+def response_validation(r_data, r_object=None, success_code = 200):
+   
+    if r_data["response_code"] != 0:
+        return "Unknown server Error", 500
+    elif r_data["response_code"] == 0 and (r_object != None or len(r_object) > 0):
+        return r_object, success_code
+    else:
+        return "Operation Successful", success_code
+
 def get_colors():  # noqa: E501
     """get_colors
 
@@ -19,20 +28,20 @@ def get_colors():  # noqa: E501
     """
 
     r = requests.get(light_base_path + "/power")
-
-    r_data = r.json()
-
-    if r_data["response_code"] != 0:
-        return "Unknown server error", 500
-
+    
+    r_data = None
     colors = []
 
-    #Only handling the first device for the moment
-    for color in r_data["devices"][0]["normal"]:
-        colors.append(color)
+    try:
+        r_data = r.json()
 
-    return colors, 200
-
+        #Only handling the first device for the moment
+        for color in r_data["devices"][0]["normal"]:
+            colors.append(color)
+    except Exception as ex:
+        print("Error processing get_colors response: ", ex)
+    
+    return response_validation(r_data, colors)
 
 def get_light_color_intensity():  # noqa: E501
     """get_light_color_intensity
@@ -42,6 +51,7 @@ def get_light_color_intensity():  # noqa: E501
 
     :rtype: List[ColorIntensity]
     """
+    
     return 'do some magic!'
 
 
@@ -56,12 +66,14 @@ def get_light_control():  # noqa: E501
 
     r = requests.get(light_base_path + '/schedule/enable')
 
-    r_data = r.json()
+    r_data = None 
+    
+    try:
+        r_data = r.json()
+    except Exception as ex:
+        print("Unable to get light control status: ", ex)
 
-    if r_data["response_code"] != 0:
-        return "Unknown server error", 500
-
-    return not r_data["enable"], 200
+    return response_validation(r_data, not r_data["enable"])
 
 
 def set_light_color_intensity(body):  # noqa: E501
@@ -95,12 +107,14 @@ def set_light_control(enable):  # noqa: E501
 
     r = requests.put(light_base_path + "/schedule/enable", data = json.dumps(data) )
 
-    r_data = r.json()
+    r_data = None
+    
+    try:
+        r_data = r.json()
+    except Exception as ex:
+        print("Unable to set light control: ", ex)
 
-    if r_data['response_code'] != 0:
-        return 'Unknown server error', 500
-        
-    return 'Operation Successful', 200
+    return response_validation(r_data) 
 
 
 def update_light_color_intensity(body):  # noqa: E501
