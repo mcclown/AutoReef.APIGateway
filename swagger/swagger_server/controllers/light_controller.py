@@ -9,14 +9,48 @@ import json
 
 light_base_path = "http://192.168.1.101/api"
 
-def response_validation(r_data, r_object=None, success_code = 200):
+class Util(object):
+    
+    @staticmethod
+    def response_validation(r_data, r_object=None, success_code = 200):
    
-    if r_data["response_code"] != 0:
-        return "Unknown server Error", 500
-    elif r_data["response_code"] == 0 and (r_object != None or len(r_object) > 0):
-        return r_object, success_code
-    else:
-        return "Operation Successful", success_code
+        if r_data["response_code"] != 0:
+            return "Unknown server Error", 500
+        elif r_data["response_code"] == 0 and (r_object != None or len(r_object) > 0):
+            return r_object, success_code
+        else:
+            return "Operation Successful", success_code
+
+    @staticmethod
+    def get_power():
+
+        r = requests.get(light_base_path + "/power")
+    
+        r_data = None
+        power_norm = {}
+        power_hd = {}
+
+        r_data = r.json()
+    
+        if r_data["response_code"] != 0:
+            raise Exception("Unable to process /power response")
+ 
+        #Only handling the first device for the moment
+
+        #Get the values for 100%
+        for color, value in r_data["devices"][0]["normal"].items():
+            power_norm[color] = value
+        
+        try:
+            #Get the values for HD
+            for color, value in r_data["devices"][0]["hd"].items():
+                power_hd[color] = value
+        except Exception:
+            #Potentially handle non-HD AI devices? #ToTest
+            print("Unable to retrieve HD power values for device")
+        
+        return power_norm, power_hd
+
 
 def get_colors():  # noqa: E501
     """get_colors
@@ -38,10 +72,11 @@ def get_colors():  # noqa: E501
         #Only handling the first device for the moment
         for color in r_data["devices"][0]["normal"]:
             colors.append(color)
+
     except Exception as ex:
         print("Error processing get_colors response: ", ex)
     
-    return response_validation(r_data, colors)
+    return Util.response_validation(r_data, colors)
 
 def get_light_color_intensity():  # noqa: E501
     """get_light_color_intensity
@@ -52,7 +87,41 @@ def get_light_color_intensity():  # noqa: E501
     :rtype: List[ColorIntensity]
     """
     
-    return 'do some magic!'
+    #Get the power values that represent 100%
+    power_norm, power_hd = Util.get_power()
+    
+    #Get the current color intensity levels
+    r = requests.get(light_base_path + "/colors")
+    r_data = None
+
+    colors = {}
+
+    try:
+        r_data = r.json()
+
+        for color, value in r_data.items():
+            #Calculate the %power
+            
+            if color != 'response_code':
+
+                if value <= 1000:
+                    colors[color] = round(value/10)
+                else:
+                    #Should never hit this case for a non-HD AI device. #ToTest
+
+                    #Calculate max percentage, when using HD
+                    max_percentage = (power_hd[color] / power_norm[color]) * 100
+
+                    #Response from /color: First 1000 is for 0 -> 100%, Second 1000 is for 100% -> Max HD% 
+                    hd_in_use = (value - 1000) / 1000  
+
+                    #Calculate total current percentage
+                    colors[color] = round(100 + ((max_percentage - 100) * hd_in_use))
+
+    except Exception as ex:
+        print("Error processing get_light_color_intensity response: ", ex)
+    
+    return Util.response_validation(r_data, colors)
 
 
 def get_light_control():  # noqa: E501
@@ -73,7 +142,7 @@ def get_light_control():  # noqa: E501
     except Exception as ex:
         print("Unable to get light control status: ", ex)
 
-    return response_validation(r_data, not r_data["enable"])
+    return Util.response_validation(r_data, not r_data["enable"])
 
 
 def set_light_color_intensity(body):  # noqa: E501
@@ -114,7 +183,7 @@ def set_light_control(enable):  # noqa: E501
     except Exception as ex:
         print("Unable to set light control: ", ex)
 
-    return response_validation(r_data) 
+    return Util.response_validation(r_data) 
 
 
 def update_light_color_intensity(body):  # noqa: E501
