@@ -6,20 +6,37 @@ from swagger.swagger_server import util
 
 import requests
 import json
+import traceback
 
 light_base_path = "http://192.168.1.101/api"
 
 class Util(object):
     
     @staticmethod
-    def response_validation(r_data, r_object=None, success_code = 200):
+    def response_validation(r_data, r_object=None, response_code = 200):
    
         if r_data["response_code"] != 0:
             return "Unknown server Error", 500
         elif r_data["response_code"] == 0 and (r_object != None or len(r_object) > 0):
-            return r_object, success_code
+            return r_object, response_code
         else:
-            return "Operation Successful", success_code
+            return "Operation Successful", response_code
+    
+    @staticmethod
+    def get_intensity():
+
+        r = requests.get(light_base_path + "/colors")
+        
+        r_data = None
+        r_data = r.json()
+    
+        if r_data["response_code"] != 0:
+            raise Exception("Unable to process /color response")
+ 
+        del r_data["response_code"]
+
+        return r_data
+
 
     @staticmethod
     def get_power():
@@ -78,6 +95,7 @@ def get_colors():  # noqa: E501
     
     return Util.response_validation(r_data, colors)
 
+
 def get_light_color_intensity():  # noqa: E501
     """get_light_color_intensity
 
@@ -87,41 +105,38 @@ def get_light_color_intensity():  # noqa: E501
     :rtype: List[ColorIntensity]
     """
     
-    #Get the power values that represent 100%
-    power_norm, power_hd = Util.get_power()
-    
-    #Get the current color intensity levels
-    r = requests.get(light_base_path + "/colors")
-    r_data = None
-
     colors = {}
 
     try:
-        r_data = r.json()
-
-        for color, value in r_data.items():
+        
+        #Get current LED channel intensities
+        intensity = Util.get_intensity()
+        
+        #Get the power values that represent 100%
+        power_norm, power_hd = Util.get_power()
+ 
+        for color, value in intensity.items():
             #Calculate the %power
             
-            if color != 'response_code':
+            if value <= 1000:
+                colors[color] = round(value/10)
+            else:
+                #Should never hit this case for a non-HD AI device. #ToTest
 
-                if value <= 1000:
-                    colors[color] = round(value/10)
-                else:
-                    #Should never hit this case for a non-HD AI device. #ToTest
+                #Calculate max percentage, when using HD
+                max_percentage = (power_hd[color] / power_norm[color]) * 100
 
-                    #Calculate max percentage, when using HD
-                    max_percentage = (power_hd[color] / power_norm[color]) * 100
+                #Response from /color: First 1000 is for 0 -> 100%, Second 1000 is for 100% -> Max HD% 
+                hd_in_use = (value - 1000) / 1000  
 
-                    #Response from /color: First 1000 is for 0 -> 100%, Second 1000 is for 100% -> Max HD% 
-                    hd_in_use = (value - 1000) / 1000  
-
-                    #Calculate total current percentage
-                    colors[color] = round(100 + ((max_percentage - 100) * hd_in_use))
+                #Calculate total current percentage
+                colors[color] = round(100 + ((max_percentage - 100) * hd_in_use))
 
     except Exception as ex:
-        print("Error processing get_light_color_intensity response: ", ex)
+        print("Error processing get_light_color_intensity response: ", traceback.format_exc())
+        return "Unknown Server Error", 500
     
-    return Util.response_validation(r_data, colors)
+    return colors, 200
 
 
 def get_light_control():  # noqa: E501
