@@ -15,26 +15,15 @@ class ColorIntensity(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, name: str=None, intensity: int=None):  # noqa: E501
+    def __init__(self):  # noqa: E501
         """ColorIntensity - a model defined in Swagger
 
-        :param name: The name of this ColorIntensity.  # noqa: E501
-        :type name: str
-        :param intensity: The intensity of this ColorIntensity.  # noqa: E501
-        :type intensity: int
         """
         self.swagger_types = {
-            'name': str,
-            'intensity': int
         }
 
         self.attribute_map = {
-            'name': 'name',
-            'intensity': 'intensity'
         }
-
-        self._name = name
-        self._intensity = intensity
 
     @classmethod
     def from_dict(cls, dikt) -> 'ColorIntensity':
@@ -46,49 +35,3 @@ class ColorIntensity(Model):
         :rtype: ColorIntensity
         """
         return util.deserialize_model(dikt, cls)
-
-    @property
-    def name(self) -> str:
-        """Gets the name of this ColorIntensity.
-
-
-        :return: The name of this ColorIntensity.
-        :rtype: str
-        """
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this ColorIntensity.
-
-
-        :param name: The name of this ColorIntensity.
-        :type name: str
-        """
-
-        self._name = name
-
-    @property
-    def intensity(self) -> int:
-        """Gets the intensity of this ColorIntensity.
-
-
-        :return: The intensity of this ColorIntensity.
-        :rtype: int
-        """
-        return self._intensity
-
-    @intensity.setter
-    def intensity(self, intensity: int):
-        """Sets the intensity of this ColorIntensity.
-
-
-        :param intensity: The intensity of this ColorIntensity.
-        :type intensity: int
-        """
-        if intensity is not None and intensity > 100:  # noqa: E501
-            raise ValueError("Invalid value for `intensity`, must be a value less than or equal to `100`")  # noqa: E501
-        if intensity is not None and intensity < 0:  # noqa: E501
-            raise ValueError("Invalid value for `intensity`, must be a value greater than or equal to `0`")  # noqa: E501
-
-        self._intensity = intensity

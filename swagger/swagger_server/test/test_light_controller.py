@@ -51,7 +51,7 @@ class TestLightController(BaseTestCase):
 
         
         """
-        body = [ColorIntensity()]
+        body = ColorIntensity()
         response = self.client.open(
             '/AutoReef/AutoReef.ApiGateway/1.0.0/light/colorIntensity',
             method='PATCH',
@@ -78,7 +78,7 @@ class TestLightController(BaseTestCase):
 
         
         """
-        body = [ColorIntensityChange()]
+        body = ColorIntensityChange()
         response = self.client.open(
             '/AutoReef/AutoReef.ApiGateway/1.0.0/light/colorIntensity/update',
             method='POST',
