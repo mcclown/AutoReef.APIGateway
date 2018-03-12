@@ -73,9 +73,7 @@ paths:
         200:
           description: "Operation successful"
           schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/colorIntensity"
+            $ref: "#/definitions/colorIntensity"
       x-swagger-router-controller: "swagger.swagger_server.controllers.light_controller"
     patch:
       tags:
@@ -87,9 +85,7 @@ paths:
         name: "body"
         required: true
         schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/colorIntensity"
+          $ref: "#/definitions/colorIntensity"
       responses:
         200:
           description: "Operation Successful"
@@ -107,9 +103,7 @@ paths:
         name: "body"
         required: true
         schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/colorIntensity"
+          $ref: "#/definitions/colorIntensityChange"
       responses:
         200:
           description: "Operation Successfull"
@@ -121,13 +115,21 @@ paths:
 definitions:
   colorIntensity:
     type: "object"
-    properties:
-      name:
-        type: "string"
-      intensity:
-        type: "integer"
-        minimum: 0
-        maximum: 100
     example:
-      intensity: 8
-      name: "name"
+      blue: 0
+      royal_blue: 33.3
+      red: 100
+    additionalProperties:
+      type: "number"
+      minimum: 0
+      maximum: 100
+  colorIntensityChange:
+    type: "object"
+    example:
+      blue: -100
+      royal_blue: 33.3
+      red: 100
+    additionalProperties:
+      type: "number"
+      minimum: -100
+      maximum: 100

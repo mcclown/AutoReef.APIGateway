@@ -2,6 +2,7 @@ import connexion
 import six
 
 from swagger.swagger_server.models.color_intensity import ColorIntensity  # noqa: E501
+from swagger.swagger_server.models.color_intensity_change import ColorIntensityChange  # noqa: E501
 from swagger.swagger_server import util
 
 import requests
@@ -102,7 +103,7 @@ def get_light_color_intensity():  # noqa: E501
     Get the current status of all colour intensities. # noqa: E501
 
 
-    :rtype: List[ColorIntensity]
+    :rtype: ColorIntensity
     """
     
     colors = {}
@@ -166,12 +167,12 @@ def set_light_color_intensity(body):  # noqa: E501
     Update the specified color intensities. # noqa: E501
 
     :param body: 
-    :type body: list | bytes
+    :type body: dict | bytes
 
     :rtype: None
     """
     if connexion.request.is_json:
-        body = [ColorIntensity.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+        body = ColorIntensity.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'
 
 
@@ -207,10 +208,10 @@ def update_light_color_intensity(body):  # noqa: E501
     Update a given color by the specified intensity percentage. # noqa: E501
 
     :param body: 
-    :type body: list | bytes
+    :type body: dict | bytes
 
     :rtype: None
     """
     if connexion.request.is_json:
-        body = [ColorIntensity.from_dict(d) for d in connexion.request.get_json()]  # noqa: E501
+        body = ColorIntensityChange.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'
