@@ -5,7 +5,7 @@ from swagger.swagger_server.models.color_intensity import ColorIntensity  # noqa
 from swagger.swagger_server.models.color_intensity_change import ColorIntensityChange  # noqa: E501
 from swagger.swagger_server import util
 
-import requests
+from requests import requests, Request
 import json
 import traceback
 
@@ -18,7 +18,7 @@ class Util(object):
    
         if r_data["response_code"] != 0:
             return "Unknown server Error", 500
-        elif r_data["response_code"] == 0 and (r_object != None or len(r_object) > 0):
+        elif r_data["response_code"] == 0 and r_object != None:
             return r_object, response_code
         else:
             return "Operation Successful", response_code
@@ -38,6 +38,24 @@ class Util(object):
 
         return r_data
 
+    @staticmethod
+    def set_intensity(body):
+        
+        #req = Request("POST", light_base_path + "/colors", json = body)
+        #prepped = req.prepare()
+        #print(prepped.body)
+        #return 500
+
+        r = requests.post(light_base_path + "/colors", json = body)
+
+        r_data = None
+        r_data = r.json()
+
+        if r_data["response_code"] == 0:
+            return 200
+        else:
+            print(r_data)
+            return 500
 
     @staticmethod
     def get_power():
@@ -171,9 +189,30 @@ def set_light_color_intensity(body):  # noqa: E501
 
     :rtype: None
     """
+    #Validation happens here as well, based on the API specs
     if connexion.request.is_json:
         body = ColorIntensity.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+
+    if len(body) < 1:
+        return "No color was specified", 400
+
+    try:
+        intensity = Util.get_intensity()
+        #power_norm, power_hd = Util.get_power()
+        
+        for color, value in body.items():
+            intensity[color] = value * 10
+
+        result = Util.set_intensity(intensity)
+
+        if result != 200:
+            return "Unable to set color intensity", result
+
+    except Exception as ex:
+        print("Error processing set_light_color_intensity response: ", traceback.format_exc())
+        return "Unknown Server Error", 500
+ 
+    return "Operation Successful", 200
 
 
 def set_light_control(enable):  # noqa: E501
@@ -214,4 +253,33 @@ def update_light_color_intensity(body):  # noqa: E501
     """
     if connexion.request.is_json:
         body = ColorIntensityChange.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    
+    if len(body) < 1:
+        return "No color was specified", 400
+
+    try:
+        intensity = Util.get_intensity()
+        #power_norm, power_hd = Util.get_power()
+        
+        for color, value in body.items():
+            temp = intensity[color] + (value * 10)
+
+            #Keep min as 0% and max as 100% (1000 intensity)
+            if temp < 0:
+                temp = 0
+            elif temp > 1000:
+                temp = 1000
+
+            intensity[color] = temp
+
+        result = Util.set_intensity(intensity)
+
+        if result != 200:
+            return "Unable to update color intensity", result
+
+    except Exception as ex:
+        print("Error processing update_light_color_intensity response: ", traceback.format_exc())
+        return "Unknown Server Error", 500
+ 
+    return "Operation Successful", 200
+
